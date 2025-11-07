@@ -8,6 +8,8 @@ def input_error(func):
             return func(*args, **kwargs)
         except ValueError as ex:
             return f"Please enter valid arguments: {ex}"
+        except AttributeError:
+            return "Contact is not found"
         except Exception as ex:
             return f"An unexpected error occurred: {str(ex)}"
     return inner
@@ -24,7 +26,6 @@ def parse_input(user_input: str) -> tuple:
 def add_contact(args, book: AddressBook) -> str:
     if len(args) < 2:
         raise ValueError("The command is - add <name> <phone>")
-
     name, phone, *_ = args
     record = book.find(name)
     message = "Contact is updated"
@@ -42,11 +43,8 @@ def add_contact(args, book: AddressBook) -> str:
 def change_contact(args: list, book: AddressBook) -> str:
     if len(args) < 3:
         raise ValueError("The command is - change <name> <old_phone> <new_phone>")
-
     name, old_phone, new_phone, *_ = args
     record = book.find(name)
-    if not record:
-        raise ValueError(f"Contact for '{name}' is not found")
     record.edit_phone(old_phone, new_phone)
 
     return "Contact is updated"
@@ -56,11 +54,8 @@ def change_contact(args: list, book: AddressBook) -> str:
 def show_phone(args: list, book: AddressBook) -> str:
     if len(args) < 1:
         raise ValueError("The command is - phone <name>")
-
     name, *_ = args
     record = book.find(name)
-    if not record:
-        raise ValueError(f"Contact for '{name}' is not found")
 
     return "; ".join(phone.value for phone in record.phones)
 
@@ -76,11 +71,8 @@ def show_all(book: AddressBook) -> str:
 def add_birthday(args: list, book: AddressBook) -> str:
     if len(args) < 2:
         raise ValueError("The command is - add-birthday <name> <birthday>")
-
     name, birthday, *_ = args
     record = book.find(name)
-    if not record:
-        raise ValueError(f"Contact for '{name}' is not found")
     record.add_birthday(birthday)
 
     return "Contact is updated"
@@ -90,11 +82,8 @@ def add_birthday(args: list, book: AddressBook) -> str:
 def show_birthday(args: list, book: AddressBook) -> str:
     if len(args) < 1:
         raise ValueError("The command is - show-birthday <birthday>")
-
     name, *_ = args
     record = book.find(name)
-    if not record:
-        raise ValueError(f"Contact for '{name}' is not found")
 
     return str(record.birthday)
 
